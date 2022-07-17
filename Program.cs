@@ -34,6 +34,7 @@ using Eleia;
 var builder = WebApplication.CreateBuilder(args);
 
 var app = builder.Build();
+var threshold = app.Configuration.GetValue<float>("Threshold", 0.99f);
 
 Eleia.ML.CodeDetector detector = new Eleia.ML.CodeDetector();
 
@@ -52,7 +53,7 @@ app.MapPost("/detectunformattedcode", async (HttpRequest request) =>
         {
             var predictionResult = detector.Predict(item);
 
-            if (predictionResult.Prediction)
+            if (predictionResult.Prediction && predictionResult.Probability > threshold)
             {
                 app.Logger.LogInformation($"Found unformatted code: {item} (prob: {predictionResult.Probability})");
                 return Results.Ok(new { prediction = true, probability = predictionResult.Probability, item = item });
