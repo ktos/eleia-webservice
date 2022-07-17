@@ -3,7 +3,7 @@
 /*
  * Eleia
  *
- * Copyright (C) Marcin Badurowicz <m at badurowicz dot net> 2019-2022
+ * Copyright (C) Marcin Badurowicz <m at badurowicz dot net> 2019
  *
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -36,7 +36,7 @@ using System.Text.RegularExpressions;
 namespace Eleia
 {
     /// <summary>
-    /// Removes elements from cleartext (markdown) of a post
+    /// Removes elements from cleartext of a post
     /// </summary>
     public static class TextCleaner
     {
@@ -59,7 +59,21 @@ namespace Eleia
         /// <returns>Post content with Blockquote elements removed</returns>
         public static string RemoveMarkdownContent(string postText)
         {
-            postText = Regex.Replace(postText, "![(.*)]\\(.*\\)", "", RegexOptions.Multiline);
+            // removing quotes
+            postText = Regex.Replace(postText, ">(.*?)\n", "");
+
+            // removing lists
+            postText = Regex.Replace(postText, "\\*(.*?)\n", "");
+            postText = Regex.Replace(postText, "\\*(.*?)$", "");
+
+            // removing images
+            postText = Regex.Replace(postText, "!\\[(.*?)\\]\\(.*?\\)", "", RegexOptions.Multiline);
+
+            // removing unformatted links
+            postText = Regex.Replace(postText, "https:\\/\\/(.*?) ", "", RegexOptions.Multiline);
+            postText = Regex.Replace(postText, "https:\\/\\/(.*)$", "", RegexOptions.Multiline);
+            postText = Regex.Replace(postText, "http:\\/\\/(.*?) ", "", RegexOptions.Multiline);
+            postText = Regex.Replace(postText, "http:\\/\\/(.*)$", "", RegexOptions.Multiline);
             return postText;
         }
 
